@@ -1,0 +1,440 @@
+---
+title: "Diagnóstico dos Modelos de Regressão"
+subtitle: "Como verificar pressupostos dos modelos de Regressão"  
+author: "Steven Dutt Ross"
+output:
+  xaringan::moon_reader:
+  lib_dir: libs
+css: xaringan-themer.css
+nature:
+  highlightStyle: github
+highlightLines: true
+countIncrementalSlides: false
+fig_width: 12 
+fig_height: 10 
+---
+  
+```{r setup, include=FALSE}
+# color: #0d2f47;
+options(htmltools.dir.version = FALSE)
+library(xaringanthemer)
+solarized_light(header_color="#b5244a")
+
+# YAML options
+#subtitle: "\u2694 <br/>with xaringan and xaringanthemer"  
+#author: "Yihui Xie"
+load("C:/Users/Steven/Documents/GitHub/Base_de_dados/marketing.RData")
+
+# library(datarium)
+# data("marketing")
+# head(marketing)
+# nomes<-c('youtube','facebook','jornal','vendas')
+# colnames(marketing)<-nomes
+# save(marketing, file='marketing.RData')
+
+#começamos explicando erros residuais e valores ajustados.
+#Em seguida, apresentamos os pressupostos de regressão linear, bem como os problemas potenciais que você pode enfrentar ao realizar a análise de regressão.
+
+```
+
+# Construindo um modelo de regressão
+
+
+##  Vamos construir um modelo para prever as vendas com base nas despesas com publicidade em mídias do youtube.
+
+```{r}
+modelo <- lm(vendas ~ youtube, data = marketing)
+modelo
+```
+
+A equação do nosso modelo de regressão é: $$y = 8,43 + 0,07*x$$, isto é, $$vendas = 8,43 + 0,047*youtube$$.
+
+---
+
+# O que são as suposições do modelo ?
+
+O **modelo de regressão linear faz várias suposições** sobre os dados disponíveis. 
+
+vamos descreve quais são as **suposições do modelo** e fornece meios para o diagnóstico desses **pressupostos da regressão** na linguagem de programação R.
+
+Depois de realizar uma regressão, **você deve sempre verificar** se o modelo funciona bem para os dados disponíveis.
+
+Ao desenvolver modelos de regressão, buscamos inspecionar a **significância dos coeficientes da regressão**, bem como o R2 que nos **indica quão bem o modelo de regressão linear se ajusta aos dados**. 
+
+Todavia, não podemos ficar somente nesta análise. É necessário realizar etapas adicionais para avaliar o quão bem o modelo se ajusta aos dados e **ter certeza que não violamos nenhum pressuposto da regressão**.
+
+---
+
+# Por que verificar pressupostos em modelos de regressão?
+
+O modelo de **regressão linear** faz a suposição de que a relação entre os preditores (x) e a variável resposta é **linear**. Isso pode não ser verdade. O relacionamento pode ser polinomial ou logarítmico.
+
+Os dados também podem conter **outliers**. Isso pode afetar o resultado da regressão.
+
+Portanto, devemos gerar um diagnóstico do modelo de regressão construído para detectar possíveis problemas e verificar se as suposições (pressupostos) feitas pelo modelo de regressão linear são atendidas ou não.
+
+Para fazer isso, geralmente examinamos a **distribuição de erros residuais**, que podem fornecer outras informações sobre seus dados.
+
+---
+
+# Valores ajustados e residuais
+
+Os valores ajustados (ou previstos) são os valores de y que você esperaria para os valores de x fornecidos de acordo com o modelo de regressão construído (ou visualmente, a linha de regressão reta de melhor ajuste).
+
+No nosso modelo, para um gasto em publicidade no youtube, o valor das vendas ajustado (previsto) seria de vendas = 8,44 + 0,0048 * youtube.
+
+A partir do gráfico de dispersão abaixo, pode ser visto que nem todos os pontos de dados caem exatamente na linha de regressão estimada. Isso significa que, para um determinado orçamento de publicidade do YouTube, os valores de venda observados podem ser diferentes dos valores de venda previstos. A diferença é chamada de erros residuais, representados por linhas vermelhas verticais.
+
+
+```{r echo=FALSE, fig.align='center', fig.height=10, fig.width=14}
+knitr::include_graphics("C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/linear-regression.png")
+```
+
+---
+
+
+Podemos aumentar os dados para adicionar valores ajustados e resíduos usando a função *augment()* do *[broom package]*. 
+
+Vamos guardar a saída em um onjeto chamado *model.diag.metrics* porque ela contém várias métricas úteis para diagnósticos de regressão.
+
+```{r}
+library(broom)
+model.diag.metrics <- augment(modelo)
+head(model.diag.metrics)
+```
+
+---
+
+Entre as colunas da tabela, existem:
+* youtube: o orçamento de publicidade do youtube investido
+* vendas: os valores de venda observados
+* .fitted: os valores de venda ajustados
+* .resid: os erros residuais
+
+No gráfico a seguir temos o erro residual (na cor vermelha) entre os valores observados e a reta de regressão ajustada. 
+
+Cada segmento vertical vermelho representa um erro residual entre um valor de venda observado e o correspondente valor previsto (ou seja, ajustado).
+
+---
+
+```{r echo=FALSE}
+library(ggplot2)
+ggplot(model.diag.metrics, aes(youtube, vendas)) +
+  geom_point() +
+  stat_smooth(method = lm, se = FALSE) +
+  geom_segment(aes(xend = youtube, yend = .fitted), color = "red", size = 0.3)
+```
+
+---
+
+# Pressupostos dos modelos de regressão
+
+Os modelos de regressão linear fazem várias suposições sobre os dados, como:
+
+1. **Linearidade dos dados**: A relação entre o preditor (x) e a variável resposta (y) é linear.
+2. **Normalidade dos resíduos**: Os erros residuais são considerados normalmente distribuídos (seguem a distribuição normal).
+3. **Homogeneidade da variância**. Presume-se que os resíduos tenham uma variância constante (homocedasticidade)
+4. **Independência** entre cada um dos termos de erro dos resíduos.
+
+Devemos verificar se essas suposições são verdadeiras ou não toda vez que . Problemas potenciais incluem:
+1. Não linearidade do resultado - relações preditoras
+2. Heterocedasticidade: Variância não constante dos termos de erro.
+3. Presença de valores influentes nos dados.
+    Outliers: valores extremos na variável resposta (y)
+    Pontos de alta alavancagem: valores extremos na variável preditores (x)
+
+Todas essas suposições e problemas potenciais podem ser verificados produzindo alguns gráficos de diagnóstico dos erros residuais.
+
+---
+
+# Diagnóstico dos Modelos de Regressão
+
+## Gráficos de diagnóstico
+
+Os gráficos de diagnósticos de regressão podem ser criados facilmente com o R.
+
+```{r eval=FALSE}
+par(mfrow = c(2, 2))
+plot(modelo)
+
+ # ou
+
+par(mfrow = c(2, 2))
+library(ggfortify)
+autoplot(modelo) 
+```
+
+---
+
+
+```{r echo=FALSE}
+par(mfrow = c(2, 2))
+library(ggfortify)
+autoplot(modelo) #plot(modelo)
+```
+
+---
+
+Os gráficos de diagnóstico mostram os resíduos de quatro maneiras diferentes:
+
+1.  **Residuals vs Fitted**: Usado para verificar as suposições de relacionamento linear. Uma linha horizontal, sem padrões distintos, é uma indicação de um relacionamento linear, o que é bom.
+
+2.  **Normal Q-Q**: Usado para examinar se os resíduos são normalmente distribuídos. É bom se os pontos residuais seguirem a linha reta.
+
+3.  **Scale-Location**: Usado para verificar a homogeneidade da variância dos resíduos (homocedasticidade). A linha horizontal com pontos igualmente espalhados é uma boa indicação de homocedasticidade. Este não é o caso em nosso exemplo, onde temos um problema de heteroscedasticidade.
+
+4.  **Residuals vs Leverage**: Usado para identificar casos influentes, ou seja, valores extremos que podem influenciar os resultados da regressão quando incluídos ou excluídos da análise. 
+
+---
+
+# Linearidade dos dados
+
+O pressuposto de linearidade pode ser verificada inspecionando o gráfico *Residuals vs Fitted*:
+```{r}
+plot(modelo, 1)
+```
+
+Idealmente, o gráfico residual não mostrará nenhum padrão ajustado. Ou seja, a linha vermelha deve ser aproximadamente horizontal em zero. A presença de um padrão pode indicar um problema com algum aspecto do modelo linear.
+
+No nosso exemplo, **não há padrão no gráfico dos resíduos**. Isso sugere que podemos assumir uma relação linear entre os preditores e a variável resposta.
+
+Note que, se o  gráfico dos resíduos indicar uma relação NÃO linear nos dados, então uma abordagem simples é usar **transformações não-lineares**, como log(x), sqrt(x) e x^2, no modelo de regressão.
+
+---
+
+### Homocedasticidade (Homogeneidade de variância)
+
+```{r}
+plot(modelo, 3)
+```
+
+
+---
+
+
+# Homocedasticidade 
+### (Homogeneidade de variância)
+
+Nesse gráfico seria bom se podemos ver uma linha horizontal com pontos igualmente espalhados. No nosso modelo, esse não é o caso.
+
+Pode-se observar que a variabilidade (variância) dos pontos residuais aumenta com o valor da variável de resposta, sugerindo variâncias não constantes nos erros dos resíduos (ou heteroscedasticidade).
+
+---
+
+Uma solução possível para reduzir o problema da heterocedasticidade é usar uma transformação de log ou raiz quadrada da variável de resposta (y).
+
+```{r}
+modelo2 <- lm(log(vendas) ~ youtube, data = marketing)
+plot(modelo2, 3)
+```
+
+---
+
+### Normalidade dos resíduos
+
+O gráfico *QQNorm* pode ser usado para verificar visualmente o pressuposto de normalidade. 
+
+O gráfico dos resíduos deve seguir aproximadamente a linha reta. 
+
+Todos os pontos caem aproximadamente ao longo desta linha de referência, então podemos assumir a normalidade.
+
+---
+
+```{r}
+plot(modelo, 2)
+```
+
+---
+
+# Normalidade dos resíduos
+
+```{r echo=FALSE, fig.align='center', fig.height=10, fig.width=14}
+knitr::include_graphics("C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/QQplot.png")
+```
+
+---
+
+# Outliers
+
+Um *outlier* é um ponto que tem um valor extremo. A presença de *outliers* pode afetar a interpretação do modelo, pois aumenta o erro.
+
+Os *outliers* podem ser identificados examinando os resíduos padronizados. Resíduos padronizados podem ser interpretados como o número de erros-padrão longe da reta de regressão. Observações cujos resíduos padronizados são maiores que 3 em valor absoluto são possíveis outliers.
+
+---
+
+
+```{r}
+plot(modelo, 5)
+```
+
+O gráfico acima destaca os 3 pontos mais extremos (linhas 26, 36 e 179 do banco de dados), com um resíduo padronizado abaixo de -2. No entanto, não há valores discrepantes que excedam 3 desvios padrão, o que é bom.
+
+---
+class: center, middle
+
+
+# Análises Adicionais
+
+---
+
+## Multicolinearidade
+
+Multicolinearidade consiste em um problema comum em regressões, no qual as variáveis independentes possuem relações lineares. Em outras palavras, as variáveis explicativas são correlacionadas.
+
+O índício mais claro da existência da multicolinearidade é quando o R² é alto, mas nenhum dos coeficientes da regressão é estatisticamente significativo segundo a estatística t convencional.
+
+### Detectando a multicolinearidade
+
+A função vif() do pacote *car*  pode ser utilizada para detectar a multicolinearidade em um modelo de regressão. Valores acima de 5 são considerados multicolineariedade fraca. Valores acima de 10 são considerados multicolineariedade forte.
+
+```{r}
+modelo3 <- lm(vendas ~ youtube + facebook + jornal, data = marketing)
+car::vif(modelo3)
+```
+
+---
+
+## Multicolinearidade
+
+No modelo a variável com maior valor foi o Jornal com VIF = 1,145187 indicando que não temos problema de multicolineariedade.
+
+Existem várias abordagens possíveis quando estamos enfrentando o problema de Multicolinearidade. A mais simples é retirar do modelo uma das variáveis independentes.
+
+
+---
+
+background-image: "C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/checkpoint.png"
+
+---
+
+# Uma outra abordagem  para verificar os pressupostos
+
+Existe uma outra abordagem além da análise gráfica para verificar os pressupostos:os **testes de hipóteses**
+
+Por exemplo, para verificar a Homocedasticidade existem testes que são úteis para estabelecer a presença ou ausência de heterocedasticidade. Vamos esstudar um deles. O teste de Breush-Pagan.
+
+Nesse segmento, vamos utilizar a base de dados *cars*.
+
+---
+
+# O teste Breusch-Pagan
+
+H0: não há heterocedasticidade.       
+H1: há heterocedasticidade. 
+
+```{r message=FALSE, warning=FALSE}
+lmMod <- lm(dist ~ speed, data=cars) 
+
+library(lmtest)
+bptest(lmMod, studentize = TRUE)
+```
+
+o teste tem um p-valor menor que um nível de significância de 0,05, portanto podemos rejeitar a hipótese nula de que a variância dos resíduos é constante (Homocedastica) e inferir que a heterocedasticidade está de fato presente.
+
+---
+
+# Como corrigir?
+
+Transformação da variável resposta: a transformação Box-Cox.
+
+### Transformação Box-Cox
+
+A transformação Box-cox é uma transformação matemática da variável para aproximá-la de uma distribuição normal. Muitas vezes, fazer uma transformação box-cox da variável Y resolve o problema.
+
+```{r}
+distBCMod <- caret::BoxCoxTrans(cars$dist)
+cars <- cbind(cars, dist_new=predict(distBCMod, cars$dist)) 
+#head(cars)
+lmMod_bc <- lm(dist_new ~ speed, data=cars)
+bptest(lmMod_bc)
+```
+
+Com um p-valor de 0,91, não rejeitamos a hipótese nula (que a variância dos resíduos é constante e, portanto, inferimos que os resíduos são homocedásticos. 
+
+---
+
+# Teste de Normalidade
+
+H0: os dados seguem uma distribuição normal.       
+H1: os dados NÃO seguem uma distribuição normal.
+
+```{r}
+residuos<-residuals(lmMod_bc)
+shapiro.test(residuos)
+```
+
+o teste tem um p-valor (0,3143) maior que o nível de significância de 0,05, portanto não rejeitamos a hipótese nula (normalidade dos dados). 
+
+---
+
+# O teste de Bonferroni para outlier
+
+```{r}
+library(car)
+outlierTest(lmMod_bc)
+```
+
+---
+class: center, middle
+
+
+# Análises Avançadas
+
+---
+
+# Análises Avançadas
+
+
+Uma violação comum das suposições na regressão MQO é a suposição de homocedasticidade. 
+Essa suposição exige que o termo de erro tenha variância constante em todos os valores das variáveis independentes. Quando essa suposição falha, os erros padrão de nossas estimativas de regressão MQO são inconsistentes. 
+
+Até agora vimos duas abordagens para identificar a heterocedasticidade (gráfico e teste)
+e duas formas para corrigi-la (trasnformações simples e transformações de box-cox). Mas esses não são os unicos métodos. vou apresentar mais dois métodos:
+
+1. Mínimos Quadrados Generalizados. 
+2. Erro padrão consistente a heterocedasticidade (Heteroskedasticity-consistent standard errors). 
+
+
+---
+
+# Mínimos Quadrados Generalizados 
+
+Até agora, temos lidado com a heterocedasticidade sob o ponto de vista do MQO. Todavia, se tivessemos conhecimento da matriz de variância-covariância do termo de erro, então poderíamos fazer um modelo heteroscedástico se tornar um modelo homocedástico. Como não temos, vamos utilizar a estimativa da matriz.
+
+```{r}
+# Feasible Generalized Least Square GLS
+lmMod <- lm(dist ~ speed, data=cars) 
+fgls <- lm(dist ~ speed, data=cars, weights = 1/lmMod$fitted.values^2)
+summary(fgls)
+```
+
+---
+
+# Erros-padrão consistentes a heterocedasticidade
+
+Podemos calcular erros padrão consistentes de heterocedasticidade de forma fácil. 
+
+
+```{r}
+# Método original
+library(sandwich)
+coeftest(lmMod, vcov = vcovHC(lmMod))
+# Método mais simples (Robust standard errors for regression models)
+library(sjstats)
+robust(lmMod)
+```
+
+---
+
+
+Fontes:
+[STHDA](http://www.sthda.com/english/articles/39-regression-model-diagnostics/161-linear-regression-assumptions-and-diagnostics-in-r-essentials/)
+
+[how-to-detect-heteroscedasticity](https://www.r-bloggers.com/how-to-detect-heteroscedasticity-and-rectify-it/)
+
+[Rpubs](https://rpubs.com/cbw1243/gls)
+
+[Robust](https://www.brodrigues.co/blog/2018-07-08-rob_stderr/)
+
+[FGLS](http://www3.grips.ac.jp/~yamanota/Lecture_Note_10_GLS_WLS_FGLS.pdf)
+
