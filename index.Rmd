@@ -14,10 +14,11 @@ fig_width: 12
 fig_height: 10 
 ---
   
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, eval=TRUE}
 # color: #0d2f47;
 options(htmltools.dir.version = FALSE)
 library(xaringanthemer)
+library(knitr)
 solarized_light(header_color="#b5244a")
 
 # YAML options
@@ -248,8 +249,12 @@ plot(modelo, 2)
 
 # Normalidade dos resíduos
 
+
+![](C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/QQplot.png)
+
 ```{r echo=FALSE, fig.align='center', fig.height=10, fig.width=14}
-knitr::include_graphics("C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/QQplot.png")
+#background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/QQplot.png)
+#knitr::include_graphics("C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/QQplot.png")
 ```
 
 ---
@@ -268,6 +273,8 @@ plot(modelo, 5)
 ```
 
 O gráfico acima destaca os 3 pontos mais extremos (linhas 26, 36 e 179 do banco de dados), com um resíduo padronizado abaixo de -2. No entanto, não há valores discrepantes que excedam 3 desvios padrão, o que é bom.
+---
+background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/checkpoint.png)
 
 ---
 class: center, middle
@@ -302,9 +309,7 @@ Existem várias abordagens possíveis quando estamos enfrentando o problema de M
 
 
 ---
-
-background-image: "C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/checkpoint.png"
-
+background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/checkpoint.png)
 ---
 
 # Uma outra abordagem  para verificar os pressupostos
