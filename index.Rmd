@@ -4,7 +4,8 @@ subtitle: "Como verificar pressupostos dos modelos de Regressão"
 author: "Steven Dutt Ross"
 output:
   xaringan::moon_reader:
-  lib_dir: libs
+    chakra: libs/remark-latest.min.js
+    lib_dir: libs
 css: xaringan-themer.css
 nature:
   highlightStyle: github
@@ -250,7 +251,7 @@ plot(modelo, 2)
 # Normalidade dos resíduos
 
 
-![](C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/QQplot.png)
+![](https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/QQplot.png)
 
 ```{r echo=FALSE, fig.align='center', fig.height=10, fig.width=14}
 #background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/QQplot.png)
@@ -275,6 +276,22 @@ plot(modelo, 5)
 O gráfico acima destaca os 3 pontos mais extremos (linhas 26, 36 e 179 do banco de dados), com um resíduo padronizado abaixo de -2. No entanto, não há valores discrepantes que excedam 3 desvios padrão, o que é bom.
 ---
 background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/checkpoint.png)
+
+
+---
+
+Descobri a pouco tempo um novo pacote do R que ajuda na construção do diagnóstico. O pacote gvlma, realiza uma validação global de pressupostos do modelo linear, bem como avaliações separadas de assimetria, curtose e heterocedasticidade.
+
+```{r}
+# Global test of model assumptions
+library(gvlma)
+gvmodel <- gvlma(modelo)
+summary(gvmodel) 
+```
+
+---
+
+background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/exemplo_gvlma.png)
 
 ---
 class: center, middle

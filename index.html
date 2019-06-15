@@ -4,8 +4,8 @@
     <title>Diagnóstico dos Modelos de Regressão</title>
     <meta charset="utf-8">
     <meta name="author" content="Steven Dutt Ross" />
-    <link href="index_files/remark-css/default.css" rel="stylesheet" />
-    <link href="index_files/remark-css/default-fonts.css" rel="stylesheet" />
+    <link href="libs/remark-css/default.css" rel="stylesheet" />
+    <link href="libs/remark-css/default-fonts.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -132,7 +132,7 @@ Cada segmento vertical vermelho representa um erro residual entre um valor de ve
 
 
 ```
-## Warning: package 'ggplot2' was built under R version 3.5.2
+## Warning: package 'ggplot2' was built under R version 3.5.3
 ```
 
 &lt;img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" /&gt;
@@ -275,7 +275,7 @@ plot(modelo, 2)
 # Normalidade dos resíduos
 
 
-![](C:/Users/Steven/Documents/GitHub/Regressao_Diagnostico/QQplot.png)
+![](https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/QQplot.png)
 
 
 
@@ -300,6 +300,66 @@ plot(modelo, 5)
 O gráfico acima destaca os 3 pontos mais extremos (linhas 26, 36 e 179 do banco de dados), com um resíduo padronizado abaixo de -2. No entanto, não há valores discrepantes que excedam 3 desvios padrão, o que é bom.
 ---
 background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/checkpoint.png)
+
+
+---
+
+Descobri a pouco tempo um novo pacote do R que ajuda na construção do diagnóstico. O pacote gvlma, realiza uma validação global de pressupostos do modelo linear, bem como avaliações separadas de assimetria, curtose e heterocedasticidade.
+
+
+```r
+# Global test of model assumptions
+library(gvlma)
+```
+
+```
+## Warning: package 'gvlma' was built under R version 3.5.2
+```
+
+```r
+gvmodel &lt;- gvlma(modelo)
+summary(gvmodel) 
+```
+
+```
+## 
+## Call:
+## lm(formula = vendas ~ youtube, data = marketing)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -10.0632  -2.3454  -0.2295   2.4805   8.6548 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 8.439112   0.549412   15.36   &lt;2e-16 ***
+## youtube     0.047537   0.002691   17.67   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.91 on 198 degrees of freedom
+## Multiple R-squared:  0.6119,	Adjusted R-squared:  0.6099 
+## F-statistic: 312.1 on 1 and 198 DF,  p-value: &lt; 2.2e-16
+## 
+## 
+## ASSESSMENT OF THE LINEAR MODEL ASSUMPTIONS
+## USING THE GLOBAL TEST ON 4 DEGREES-OF-FREEDOM:
+## Level of Significance =  0.05 
+## 
+## Call:
+##  gvlma(x = modelo) 
+## 
+##                     Value p-value                Decision
+## Global Stat        5.3240 0.25564 Assumptions acceptable.
+## Skewness           0.2619 0.60885 Assumptions acceptable.
+## Kurtosis           0.4070 0.52352 Assumptions acceptable.
+## Link Function      3.6906 0.05472 Assumptions acceptable.
+## Heteroscedasticity 0.9646 0.32602 Assumptions acceptable.
+```
+
+---
+
+background-image: url(https://raw.githubusercontent.com/DATAUNIRIO/Regressao_Diagnostico/master/exemplo_gvlma.png)
 
 ---
 class: center, middle
@@ -438,6 +498,10 @@ library(car)
 ```
 
 ```
+## Warning: package 'car' was built under R version 3.5.3
+```
+
+```
 ## Loading required package: carData
 ```
 
@@ -539,6 +603,10 @@ library(sjstats)
 ```
 
 ```
+## Warning: package 'sjstats' was built under R version 3.5.3
+```
+
+```
 ## 
 ## Attaching package: 'sjstats'
 ```
@@ -554,11 +622,9 @@ robust(lmMod)
 ```
 
 ```
-## # A tibble: 2 x 5
-##   term        estimate std.error statistic  p.value
-##   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-## 1 (Intercept)   -17.6      5.93      -2.96 4.72e- 3
-## 2 speed           3.93     0.428      9.20 3.64e-12
+##          term   estimate std.error statistic      p.value
+## 1 (Intercept) -17.579095 5.9318033 -2.963533 4.722042e-03
+## 2       speed   3.932409 0.4275372  9.197816 3.635819e-12
 ```
 
 ---
@@ -575,7 +641,7 @@ Fontes:
 
 [FGLS](http://www3.grips.ac.jp/~yamanota/Lecture_Note_10_GLS_WLS_FGLS.pdf)
     </textarea>
-<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="libs/remark-latest.min.js"></script>
 <script>var slideshow = remark.create();
 if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
   window.dispatchEvent(new Event('resize'));
