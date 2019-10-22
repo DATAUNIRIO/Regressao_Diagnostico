@@ -1,0 +1,60 @@
+rm(list=ls())
+
+pdf(file="taxahomicidio-sedescopa.pdf",width=10,height=8)
+
+names = c("Rio de Janeiro","Sao Paulo","Belo Horizonte","Porto Alegre","Curitiba",
+          "Cuiaba","Brasilia","Manaus","Fortaleza","Natal","Recife","Salvador")
+data  = read.table("taxahomicidio-sedescopa.txt",header=TRUE)
+data1 = NULL
+ano   = 1980:2009
+for (i in 1:30)
+ data1 = rbind(data1,cbind(rep(ano[i],12),t(data[i,2:13])))
+
+# Linear regression  
+y    = data1[,2]
+x    = data1[,1]
+reg  = lm(y~x)
+coef = reg$coef
+
+par(mfrow=c(1,1))
+plot(x,y,xlab="Year",ylab="Homicide rate")
+abline(coef,col=2,lwd=2)
+
+# Residual analysis
+ehat  = reg$res
+U     = max(abs(ehat))
+L     = -U
+par(mfrow=c(1,1))
+plot(x,ehat,xlab="Year",ylab="Residuals",ylim=range(L,U))
+abline(h=0,col=2,lwd=2)
+
+# Pagan test
+ehat2 = ehat^2
+summary(lm(ehat2~x))
+
+# White test
+x2 = x^2
+summary(lm(ehat2~x+x2))
+
+# Modeling ehat2
+par(mfrow=c(1,1))
+plot(x,ehat2,xlab="Year",ylab="Square residuals")
+abline(lm(ehat2~x),col=2,lwd=2)
+
+par(mfrow=c(1,1))
+logehat2 = log(ehat2)
+plot(x,logehat2,xlab="Year",ylab="Log square residuals")
+abline(lm(logehat2~x),col=2,lwd=2)
+
+# Time series plots
+ltys = c(rep(1,6),rep(2,6))
+cols  = c(c(1:4,6:7),c(1:4,6:7))
+par(mfrow=c(1,1))
+plot(data[,1],data[,2],axes=FALSE,xlab="Year",ylab="Homicide rate",ylim=range(data[,2:13]),type="l",lwd=2)
+for (i in 3:13) lines(data[,1],data[,i],lwd=2,col=cols[i-1],lty=ltys[i-1])
+box();axis(2);axis(1,at=ano,lab=ano)
+legend(1983,500,legend=names,col=cols,lty=ltys,bty="n",lwd=2)
+
+
+dev.off()
+

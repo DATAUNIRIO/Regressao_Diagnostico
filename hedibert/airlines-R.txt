@@ -1,0 +1,108 @@
+#########################################################################
+#
+#  Costs for U.S. Airlines, 90 Observations on 6 firms for 1970-1984
+#  
+#  Variables:
+#
+#     1. Airline
+#     2. Year
+#     3. Output, in revenue passenger miles, index number
+#     4. Total cost, in $1000
+#     5. Fuel price
+#     6. Load factor, the average capacity utilization of the fleet
+#
+#########################################################################
+
+data       = matrix(scan("airlines.txt"),byrow=TRUE,ncol=6)
+logcost    = log(data[,4])
+logoutput  = log(data[,3])
+logfuel    = log(data[,5])
+loadfactor = data[,6]
+
+########################
+# Ordinary least squares
+########################
+n     = nrow(data)
+X     = cbind(1,logoutput,logfuel,loadfactor)
+k     = ncol(X)
+y     = logcost
+iXtX  = solve(t(X)%*%X)
+bhat  = iXtX%*%t(X)%*%y
+yhat  = X%*%bhat
+ehat  = y-yhat
+s2hat = sum(ehat^2)/(n-k)
+se    = sqrt(diag(s2hat*iXtX))
+
+round(cbind(bhat,se,bhat/se,2*(1-pt(abs(bhat/se),n-k))),5)
+
+########################
+# Teste de Breusch-Pagan
+########################
+ehat2 = ehat^2
+summary(lm(ehat2~X-1))
+
+# F-statistic: 12.44 on 4 and 86 DF,  p-value: 4.981e-08
+
+########################
+# Teste de White
+########################
+x1 = logoutput
+x2 = logfuel
+x3 = loadfactor
+x1x2 = x1*x2
+x1x3 = x1*x3
+x2x3 = x2*x3
+x12  = x1^2
+x22  = x2^2
+x32  = x3^2
+summary(lm(ehat2~x1+x2+x3+x12+x22+x32+x1x2+x1x3+x1x3))
+
+#F-statistic: 6.948 on 8 and 81 DF,  p-value: 6.189e-07
+
+####################################
+# Teste de White: regressao auxiliar
+####################################
+yhat2 = yhat^2
+summary(lm(ehat2~yhat+yhat2))
+
+#F-statistic: 17.91 on 2 and 87 DF,  p-value: 3.054e-07
+
+
+###########################################
+# White standard error (robust estimator)
+###########################################
+Omega = diag(ehat2[,1])
+se.white = sqrt(diag(iXtX%*%t(X)%*%Omega%*%X%*%iXtX))
+
+cbind(bhat,se,se.white)
+
+###########################################
+# Generalized least square (GLS) estimator
+###########################################
+Psi    = diag(sqrt(1/ehat2[,1]))
+y1     = Psi%*%y
+X1     = Psi%*%X
+iXtX1  = solve(t(X1)%*%X1)
+bhat1  = iXtX1%*%t(X1)%*%y1
+se.gls = sqrt(diag(iXtX1)/s2hat)
+
+cbind(bhat,se,se.white,bhat1,se.gls)
+
+###########################################
+# Heterocedasticity of known form
+###########################################
+par(mfrow=c(1,1))
+plot(loadfactor,ehat,xlim=c(0.4,0.7),ylim=c(-0.4,0.4),
+     xlab="Load factor, the average capacity utilization of the fleet",
+     ylab="Residuals")
+abline(h=0,lty=2)
+segments(0.4,0,0.6,0.4,lty=2,col=2)
+segments(0.4,0,0.6,-0.4,lty=2,col=2)
+
+plot(loadfactor,log(ehat^2),
+     xlab="Load factor, the average capacity utilization of the fleet",
+     ylab="Log Squared Residuals")
+abline(lm(log(ehat^2)~loadfactor),col=2)
+
+summary(lm(log(ehat^2)~loadfactor))
+

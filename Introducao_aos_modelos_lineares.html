@@ -499,6 +499,26 @@ summary(modelo1)
 
 ---
 
+### A previsão
+Para fins de teste, vamos tentar prever o MPG para o carro Valiant:
+
+
+```r
+data("mtcars")
+modelo_geral = lm(mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb , data=mtcars)
+
+df &lt;- data.frame(cyl = 6, disp = 225, hp = 105, drat = 2.76, wt = 3.460, qsec = 20.22, vs = 1, am = 0, gear = 3, carb = 1)
+predict(modelo_geral, df)
+```
+
+```
+##        1 
+## 20.38304
+```
+O MPG real para este carro é 18,1.
+
+---
+
 # R2 e R2 ajustado
 
 
@@ -523,7 +543,7 @@ summary(modelo_geral)$r.squared
 ```
 
 ```
-## [1] 0.8634989
+## [1] 0.8690158
 ```
 
 ```r
@@ -547,7 +567,7 @@ summary(modelo_geral)$adj.r.squared
 ```
 
 ```
-## [1] 0.8160203
+## [1] 0.8066423
 ```
 
 ---
@@ -575,7 +595,7 @@ summary(modelo_geral)$adj.r.squared
 ```
 
 ```
-## [1] 0.8160203
+## [1] 0.8066423
 ```
 
 ```r
@@ -599,7 +619,7 @@ AIC(modelo_geral)
 ```
 
 ```
-## [1] 161.03
+## [1] 163.7098
 ```
 
 ---
@@ -612,92 +632,133 @@ step &lt;- stepAIC(modelo_geral, direction="both") # quanto menor o AIC mais par
 ```
 
 ```
-## Start:  AIC=68.22
-## Kmporlitro ~ HP + Peso + TipodeMarcha + Tipodecombustivel + NumdeValvulas + 
-##     NumdeMarchas + RPM + Cilindros
+## Start:  AIC=70.9
+## mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb
 ## 
-##                     Df Sum of Sq    RSS    AIC
-## - Cilindros          1     0.019 153.73 66.222
-## - Tipodecombustivel  1     0.053 153.76 66.229
-## - NumdeMarchas       1     2.122 155.83 66.657
-## - HP                 1     3.610 157.32 66.961
-## - RPM                1     5.822 159.53 67.408
-## - NumdeValvulas      1     5.976 159.68 67.439
-## &lt;none&gt;                           153.71 68.218
-## - TipodeMarcha       1    12.047 165.75 68.633
-## - Peso               1    35.865 189.57 72.929
+##        Df Sum of Sq    RSS    AIC
+## - cyl   1    0.0799 147.57 68.915
+## - vs    1    0.1601 147.66 68.932
+## - carb  1    0.4067 147.90 68.986
+## - gear  1    1.3531 148.85 69.190
+## - drat  1    1.6270 149.12 69.249
+## - disp  1    3.9167 151.41 69.736
+## - hp    1    6.8399 154.33 70.348
+## - qsec  1    8.8641 156.36 70.765
+## &lt;none&gt;              147.49 70.898
+## - am    1   10.5467 158.04 71.108
+## - wt    1   27.0144 174.51 74.280
 ## 
-## Step:  AIC=66.22
-## Kmporlitro ~ HP + Peso + TipodeMarcha + Tipodecombustivel + NumdeValvulas + 
-##     NumdeMarchas + RPM
+## Step:  AIC=68.92
+## mpg ~ disp + hp + drat + wt + qsec + vs + am + gear + carb
 ## 
-##                     Df Sum of Sq    RSS    AIC
-## - Tipodecombustivel  1     0.094 153.82 64.241
-## - NumdeMarchas       1     2.665 156.39 64.772
-## - HP                 1     4.636 158.36 65.173
-## - NumdeValvulas      1     5.997 159.72 65.447
-## - RPM                1     7.065 160.79 65.660
-## &lt;none&gt;                           153.73 66.222
-## - TipodeMarcha       1    13.907 167.63 66.993
-## + Cilindros          1     0.019 153.71 68.218
-## - Peso               1    37.519 191.25 71.210
+##        Df Sum of Sq    RSS    AIC
+## - vs    1    0.2685 147.84 66.973
+## - carb  1    0.5201 148.09 67.028
+## - gear  1    1.8211 149.40 67.308
+## - drat  1    1.9826 149.56 67.342
+## - disp  1    3.9009 151.47 67.750
+## - hp    1    7.3632 154.94 68.473
+## &lt;none&gt;              147.57 68.915
+## - qsec  1   10.0933 157.67 69.032
+## - am    1   11.8359 159.41 69.384
+## + cyl   1    0.0799 147.49 70.898
+## - wt    1   27.0280 174.60 72.297
 ## 
-## Step:  AIC=64.24
-## Kmporlitro ~ HP + Peso + TipodeMarcha + NumdeValvulas + NumdeMarchas + 
-##     RPM
+## Step:  AIC=66.97
+## mpg ~ disp + hp + drat + wt + qsec + am + gear + carb
 ## 
-##                     Df Sum of Sq    RSS    AIC
-## - NumdeMarchas       1     3.019 156.84 62.864
-## - HP                 1     4.544 158.36 63.173
-## - NumdeValvulas      1     6.075 159.90 63.481
-## &lt;none&gt;                           153.82 64.241
-## - TipodeMarcha       1    13.815 167.63 64.994
-## - RPM                1    14.025 167.84 65.034
-## + Tipodecombustivel  1     0.094 153.73 66.222
-## + Cilindros          1     0.060 153.76 66.229
-## - Peso               1    44.840 198.66 70.428
+##        Df Sum of Sq    RSS    AIC
+## - carb  1    0.6855 148.53 65.121
+## - gear  1    2.1437 149.99 65.434
+## - drat  1    2.2139 150.06 65.449
+## - disp  1    3.6467 151.49 65.753
+## - hp    1    7.1060 154.95 66.475
+## &lt;none&gt;              147.84 66.973
+## - am    1   11.5694 159.41 67.384
+## - qsec  1   15.6830 163.53 68.200
+## + vs    1    0.2685 147.57 68.915
+## + cyl   1    0.1883 147.66 68.932
+## - wt    1   27.3799 175.22 70.410
 ## 
-## Step:  AIC=62.86
-## Kmporlitro ~ HP + Peso + TipodeMarcha + NumdeValvulas + RPM
+## Step:  AIC=65.12
+## mpg ~ disp + hp + drat + wt + qsec + am + gear
 ## 
-##                     Df Sum of Sq    RSS    AIC
-## - NumdeValvulas      1     3.227 160.07 61.515
-## - HP                 1     4.411 161.25 61.751
-## &lt;none&gt;                           156.84 62.864
-## + NumdeMarchas       1     3.019 153.82 64.241
-## - RPM                1    18.086 174.93 64.356
-## + Cilindros          1     0.929 155.91 64.673
-## + Tipodecombustivel  1     0.448 156.39 64.772
-## - TipodeMarcha       1    29.194 186.03 66.326
-## - Peso               1    66.734 223.57 72.208
+##        Df Sum of Sq    RSS    AIC
+## - gear  1     1.565 150.09 63.457
+## - drat  1     1.932 150.46 63.535
+## &lt;none&gt;              148.53 65.121
+## - disp  1    10.110 158.64 65.229
+## - am    1    12.323 160.85 65.672
+## - hp    1    14.826 163.35 66.166
+## + carb  1     0.685 147.84 66.973
+## + vs    1     0.434 148.09 67.028
+## + cyl   1     0.414 148.11 67.032
+## - qsec  1    26.408 174.94 68.358
+## - wt    1    69.127 217.66 75.350
+## 
+## Step:  AIC=63.46
+## mpg ~ disp + hp + drat + wt + qsec + am
+## 
+##        Df Sum of Sq    RSS    AIC
+## - drat  1     3.345 153.44 62.162
+## - disp  1     8.545 158.64 63.229
+## &lt;none&gt;              150.09 63.457
+## - hp    1    13.285 163.38 64.171
+## + gear  1     1.565 148.53 65.121
+## + cyl   1     1.003 149.09 65.242
+## + vs    1     0.645 149.45 65.319
+## + carb  1     0.107 149.99 65.434
+## - am    1    20.036 170.13 65.466
+## - qsec  1    25.574 175.67 66.491
+## - wt    1    67.572 217.66 73.351
+## 
+## Step:  AIC=62.16
+## mpg ~ disp + hp + wt + qsec + am
+## 
+##        Df Sum of Sq    RSS    AIC
+## - disp  1     6.629 160.07 61.515
+## &lt;none&gt;              153.44 62.162
+## - hp    1    12.572 166.01 62.682
+## + drat  1     3.345 150.09 63.457
+## + gear  1     2.977 150.46 63.535
+## + cyl   1     2.447 150.99 63.648
+## + vs    1     1.121 152.32 63.927
+## + carb  1     0.011 153.43 64.160
+## - qsec  1    26.470 179.91 65.255
+## - am    1    32.198 185.63 66.258
+## - wt    1    69.043 222.48 72.051
 ## 
 ## Step:  AIC=61.52
-## Kmporlitro ~ HP + Peso + TipodeMarcha + RPM
+## mpg ~ hp + wt + qsec + am
 ## 
-##                     Df Sum of Sq    RSS    AIC
-## - HP                 1     9.219 169.29 61.307
-## &lt;none&gt;                           160.07 61.515
-## + NumdeValvulas      1     3.227 156.84 62.864
-## - RPM                1    20.225 180.29 63.323
-## + Cilindros          1     0.249 159.82 63.465
-## + Tipodecombustivel  1     0.249 159.82 63.466
-## + NumdeMarchas       1     0.171 159.90 63.481
-## - TipodeMarcha       1    25.993 186.06 64.331
-## - Peso               1    78.494 238.56 72.284
+##        Df Sum of Sq    RSS    AIC
+## - hp    1     9.219 169.29 61.307
+## &lt;none&gt;              160.07 61.515
+## + disp  1     6.629 153.44 62.162
+## + carb  1     3.227 156.84 62.864
+## + drat  1     1.428 158.64 63.229
+## - qsec  1    20.225 180.29 63.323
+## + cyl   1     0.249 159.82 63.465
+## + vs    1     0.249 159.82 63.466
+## + gear  1     0.171 159.90 63.481
+## - am    1    25.993 186.06 64.331
+## - wt    1    78.494 238.56 72.284
 ## 
 ## Step:  AIC=61.31
-## Kmporlitro ~ Peso + TipodeMarcha + RPM
+## mpg ~ wt + qsec + am
 ## 
-##                     Df Sum of Sq    RSS    AIC
-## &lt;none&gt;                           169.29 61.307
-## + HP                 1     9.219 160.07 61.515
-## + NumdeValvulas      1     8.036 161.25 61.751
-## + Cilindros          1     1.501 167.78 63.022
-## + NumdeMarchas       1     0.123 169.16 63.284
-## + Tipodecombustivel  1     0.000 169.29 63.307
-## - TipodeMarcha       1    26.178 195.46 63.908
-## - RPM                1   109.034 278.32 75.217
-## - Peso               1   183.347 352.63 82.790
+##        Df Sum of Sq    RSS    AIC
+## &lt;none&gt;              169.29 61.307
+## + hp    1     9.219 160.07 61.515
+## + carb  1     8.036 161.25 61.751
+## + disp  1     3.276 166.01 62.682
+## + cyl   1     1.501 167.78 63.022
+## + drat  1     1.400 167.89 63.042
+## + gear  1     0.123 169.16 63.284
+## + vs    1     0.000 169.29 63.307
+## - am    1    26.178 195.46 63.908
+## - qsec  1   109.034 278.32 75.217
+## - wt    1   183.347 352.63 82.790
 ```
 
 ```r
@@ -709,20 +770,21 @@ step$anova # display results
 ## Analysis of Deviance Table
 ## 
 ## Initial Model:
-## Kmporlitro ~ HP + Peso + TipodeMarcha + Tipodecombustivel + NumdeValvulas + 
-##     NumdeMarchas + RPM + Cilindros
+## mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb
 ## 
 ## Final Model:
-## Kmporlitro ~ Peso + TipodeMarcha + RPM
+## mpg ~ wt + qsec + am
 ## 
 ## 
-##                  Step Df   Deviance Resid. Df Resid. Dev      AIC
-## 1                                          23   153.7067 68.21792
-## 2         - Cilindros  1 0.01928577        24   153.7259 66.22194
-## 3 - Tipodecombustivel  1 0.09391889        25   153.8199 64.24148
-## 4      - NumdeMarchas  1 3.01940929        26   156.8393 62.86354
-## 5     - NumdeValvulas  1 3.22719028        27   160.0665 61.51530
-## 6                - HP  1 9.21946935        28   169.2859 61.30730
+##     Step Df   Deviance Resid. Df Resid. Dev      AIC
+## 1                             21   147.4944 70.89774
+## 2  - cyl  1 0.07987121        22   147.5743 68.91507
+## 3   - vs  1 0.26852280        23   147.8428 66.97324
+## 4 - carb  1 0.68546077        24   148.5283 65.12126
+## 5 - gear  1 1.56497053        25   150.0933 63.45667
+## 6 - drat  1 3.34455117        26   153.4378 62.16190
+## 7 - disp  1 6.62865369        27   160.0665 61.51530
+## 8   - hp  1 9.21946935        28   169.2859 61.30730
 ```
 
 ---

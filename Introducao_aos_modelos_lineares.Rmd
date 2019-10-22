@@ -455,6 +455,21 @@ summary(modelo1)
 
 ---
 
+### A previsão
+Para fins de teste, vamos tentar prever o MPG para o carro Valiant:
+
+```{r}
+data("mtcars")
+modelo_geral = lm(mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb , data=mtcars)
+
+df <- data.frame(cyl = 6, disp = 225, hp = 105, drat = 2.76, wt = 3.460, qsec = 20.22, vs = 1, am = 0, gear = 3, carb = 1)
+predict(modelo_geral, df)
+
+```
+O MPG real para este carro é 18,1.
+
+---
+
 # R2 e R2 ajustado
 
 ```{r}

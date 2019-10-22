@@ -34,14 +34,23 @@ summary(fit)  # Report the results
 
 
 
+
+data("mtcars")
 ###Regressao linear Multipla
-modelo1 = lm(mpg ~ hp + wt , data=CARROS)
-modelo2 = lm(mpg ~ hp + wt + disp, data=CARROS)
-modelo_geral = lm(mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb , data=CARROS)
+modelo1 = lm(mpg ~ hp + wt , data=mtcars)
+modelo2 = lm(mpg ~ hp + wt + disp, data=mtcars)
+modelo_geral = lm(mpg ~ cyl + disp + hp + drat + wt + qsec + vs + am + gear + carb , data=mtcars)
 
 summary(modelo1)
 summary(modelo2)
 summary(modelo_geral)
+
+#The Prediction
+#For testing purposes the model predicts the MPG for Valiant:
+df <- data.frame(cyl = 6, disp = 225, hp = 105, drat = 2.76, wt = 3.460, qsec = 20.22, vs = 1, am = 0, gear = 3, carb = 1)
+predict(modelo_geral, df)
+# The actual MPG for this car is 18.1
+
 
 ### Sele??o de modelo (vari?veis) STEPWISE
 library(MASS)
